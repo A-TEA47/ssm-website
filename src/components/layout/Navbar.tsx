@@ -6,14 +6,15 @@ import { usePathname } from "next/navigation";
 import { Menu, X, Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 const navigation = [
   { name: "Home", href: "/" },
-  { name: "About Us", href: "/about" },
+  { name: "About", href: "/about" },
   { name: "Services", href: "/services" },
   { name: "Government", href: "/government" },
   { name: "Career", href: "/career" },
-  { name: "SSM Academy", href: "/ssm-academy" },
+  { name: "Academy", href: "/ssm-academy" },
   { name: "Contact", href: "/contact" },
 ];
 
@@ -23,118 +24,217 @@ export function Navbar() {
   const pathname = usePathname();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <header
-      className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-all duration-300 border-b",
-        scrolled
-          ? "glass-effect border-white/10 shadow-lg"
-          : "bg-transparent border-transparent"
-      )}
+      className="fixed inset-x-0 top-0 z-50 transition-all duration-300"
+      style={{
+        backgroundColor: "var(--navbar-bg)",
+        borderBottom: "1px solid var(--navbar-border)",
+        boxShadow: scrolled ? "0 1px 16px rgba(0,0,0,0.08)" : "none",
+        backdropFilter: scrolled ? "blur(12px)" : "none",
+      }}
     >
-      <nav className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
-        <div className="flex lg:flex-1">
-          <Link href="/" className="-m-1.5 p-1.5 flex flex-col">
-            <span className="sr-only">Security Systems Management</span>
-            <span className="text-xl font-bold tracking-tight text-white uppercase heading-premium">
-              SSM Inc.
-            </span>
-            <span className="text-xs text-secondary font-medium tracking-widest">
-              Security Systems Management
-            </span>
-          </Link>
-        </div>
-        <div className="flex lg:hidden">
-          <button
-            type="button"
-            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-300"
-            onClick={() => setMobileMenuOpen(true)}
+      {/* Top bar: brand + actions */}
+      <div
+        className="border-b hidden lg:flex items-center justify-between px-8 xl:px-12 py-2"
+        style={{ borderColor: "var(--surface-border)" }}
+      >
+        {/* Logo */}
+        <Link href="/" className="flex flex-col leading-none group">
+          <span
+            className="text-xl font-extrabold tracking-tight uppercase editorial-heading"
+            style={{ color: "var(--navbar-text)" }}
           >
-            <span className="sr-only">Open main menu</span>
-            <Menu className="h-6 w-6" aria-hidden="true" />
-          </button>
-        </div>
-        <div className="hidden lg:flex lg:gap-x-8">
-          {navigation.map((item) => {
-            const isActive = pathname === item.href || (item.href !== "/" && pathname?.startsWith(item.href));
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={cn(
-                  "text-sm font-semibold leading-6 transition-colors",
-                  isActive ? "text-secondary" : "text-gray-300 hover:text-white"
-                )}
-              >
-                {item.name}
-              </Link>
-            );
-          })}
-        </div>
-        <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:items-center lg:gap-6">
-          <a href="tel:5103639189" className="text-sm font-semibold leading-6 text-white flex items-center gap-2 hover:text-secondary transition-colors">
-            <Phone className="w-4 h-4 text-secondary" />
+            SSM Inc.
+          </span>
+          <span
+            className="text-[11px] font-semibold tracking-[0.18em] uppercase"
+            style={{ color: "var(--brand-blue)" }}
+          >
+            Security Systems Management
+          </span>
+        </Link>
+
+        {/* Right: phone + theme toggle + CTA */}
+        <div className="flex items-center gap-5">
+          <a
+            href="tel:5103639189"
+            className="flex items-center gap-2 text-sm font-semibold transition-colors whitespace-nowrap"
+            style={{ color: "var(--text-secondary)" }}
+          >
+            <Phone
+              className="w-4 h-4 shrink-0"
+              style={{ color: "var(--brand-blue)" }}
+            />
             (510) 363-9189
           </a>
+          <ThemeToggle />
           <Button asChild variant="primary" size="sm">
             <Link href="/contact">Get a Quote</Link>
           </Button>
         </div>
+      </div>
+
+      {/* Bottom bar: nav links */}
+      <nav
+        className="hidden lg:flex items-center justify-center gap-1 px-8 xl:px-12 py-0"
+        aria-label="Main navigation"
+      >
+        {navigation.map((item) => {
+          const isActive =
+            pathname === item.href ||
+            (item.href !== "/" && pathname?.startsWith(item.href));
+          return (
+            <Link
+              key={item.name}
+              href={item.href}
+              className={cn(
+                "relative px-4 py-3 text-sm font-semibold transition-all duration-200 whitespace-nowrap group"
+              )}
+              style={{ color: isActive ? "var(--brand-blue)" : "var(--navbar-link)" }}
+            >
+              {item.name}
+              {/* Active indicator */}
+              <span
+                className="absolute bottom-0 left-4 right-4 h-[2px] rounded-t-full transition-all duration-200"
+                style={{
+                  backgroundColor: "var(--brand-blue)",
+                  opacity: isActive ? 1 : 0,
+                  transform: isActive ? "scaleX(1)" : "scaleX(0)",
+                }}
+              />
+              {/* Hover indicator */}
+              {!isActive && (
+                <span
+                  className="absolute bottom-0 left-4 right-4 h-[2px] rounded-t-full opacity-0 group-hover:opacity-40 transition-opacity duration-200"
+                  style={{ backgroundColor: "var(--brand-blue)" }}
+                />
+              )}
+            </Link>
+          );
+        })}
       </nav>
 
-      {/* Mobile menu */}
+      {/* ── Mobile bar ── */}
+      <div className="lg:hidden flex items-center justify-between px-5 py-4">
+        <Link href="/" className="flex flex-col leading-none">
+          <span
+            className="text-lg font-extrabold tracking-tight uppercase editorial-heading"
+            style={{ color: "var(--navbar-text)" }}
+          >
+            SSM Inc.
+          </span>
+          <span
+            className="text-[10px] font-semibold tracking-widest uppercase"
+            style={{ color: "var(--brand-blue)" }}
+          >
+            Security Systems Management
+          </span>
+        </Link>
+
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
+          <button
+            type="button"
+            className="p-2 rounded-md transition-colors"
+            style={{ color: "var(--text-secondary)" }}
+            onClick={() => setMobileMenuOpen(true)}
+            aria-label="Open menu"
+          >
+            <Menu className="h-6 w-6" />
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile drawer */}
       {mobileMenuOpen && (
         <div className="lg:hidden" role="dialog" aria-modal="true">
-          <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
-          <div className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-surface px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-white/10">
-            <div className="flex items-center justify-between">
-              <Link href="/" className="-m-1.5 p-1.5" onClick={() => setMobileMenuOpen(false)}>
-                <span className="text-xl font-bold tracking-tight text-white uppercase heading-premium">
+          <div
+            className="fixed inset-0 z-50"
+            style={{ backgroundColor: "rgba(15,23,42,0.4)", backdropFilter: "blur(4px)" }}
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          <div
+            className="fixed inset-y-0 right-0 z-50 w-full max-w-xs overflow-y-auto shadow-2xl flex flex-col"
+            style={{ backgroundColor: "var(--surface)", borderLeft: "1px solid var(--surface-border)" }}
+          >
+            {/* Drawer header */}
+            <div
+              className="flex items-center justify-between px-6 py-5 border-b"
+              style={{ borderColor: "var(--surface-border)" }}
+            >
+              <Link
+                href="/"
+                className="flex flex-col"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <span className="text-lg font-extrabold tracking-tight uppercase editorial-heading" style={{ color: "var(--text-primary)" }}>
                   SSM Inc.
+                </span>
+                <span className="text-[10px] font-semibold tracking-widest uppercase" style={{ color: "var(--brand-blue)" }}>
+                  Security Systems Management
                 </span>
               </Link>
               <button
                 type="button"
-                className="-m-2.5 rounded-md p-2.5 text-gray-300"
+                className="p-2 rounded-md"
+                style={{ color: "var(--text-secondary)" }}
                 onClick={() => setMobileMenuOpen(false)}
+                aria-label="Close menu"
               >
-                <span className="sr-only">Close menu</span>
-                <X className="h-6 w-6" aria-hidden="true" />
+                <X className="h-6 w-6" />
               </button>
             </div>
-            <div className="mt-6 flow-root">
-              <div className="-my-6 divide-y divide-gray-500/25">
-                <div className="space-y-2 py-6">
-                  {navigation.map((item) => (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-300 hover:bg-surface-hover hover:text-white"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
-                </div>
-                <div className="py-6 flex flex-col gap-4">
-                  <a href="tel:5103639189" className="text-base font-semibold leading-6 text-white flex items-center gap-2">
-                    <Phone className="w-5 h-5 text-secondary" />
-                    (510) 363-9189
-                  </a>
-                  <Button asChild variant="primary" className="w-full">
-                    <Link href="/contact" onClick={() => setMobileMenuOpen(false)}>
-                      Get a Quote
-                    </Link>
-                  </Button>
-                </div>
-              </div>
+
+            {/* Drawer links */}
+            <nav className="flex-1 px-4 py-6 space-y-1">
+              {navigation.map((item) => {
+                const isActive =
+                  pathname === item.href ||
+                  (item.href !== "/" && pathname?.startsWith(item.href));
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className="flex items-center px-4 py-3 rounded-sm text-base font-semibold transition-colors"
+                    style={{
+                      color: isActive ? "var(--brand-blue)" : "var(--text-secondary)",
+                      backgroundColor: isActive ? "var(--bg-muted)" : "transparent",
+                    }}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {isActive && (
+                      <span className="w-1.5 h-1.5 rounded-full mr-3 shrink-0" style={{ backgroundColor: "var(--brand-blue)" }} />
+                    )}
+                    {item.name}
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {/* Drawer footer */}
+            <div
+              className="px-6 py-6 border-t space-y-4"
+              style={{ borderColor: "var(--surface-border)" }}
+            >
+              <a
+                href="tel:5103639189"
+                className="flex items-center gap-3 font-semibold"
+                style={{ color: "var(--text-primary)" }}
+              >
+                <Phone className="w-5 h-5 shrink-0" style={{ color: "var(--brand-blue)" }} />
+                (510) 363-9189
+              </a>
+              <Button asChild variant="primary" className="w-full">
+                <Link href="/contact" onClick={() => setMobileMenuOpen(false)}>
+                  Get a Quote
+                </Link>
+              </Button>
             </div>
           </div>
         </div>
